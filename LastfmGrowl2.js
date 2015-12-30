@@ -60,12 +60,14 @@ GrowlMonkey = function(){
             GrowlMonkey.register(appname, "http://www.growlforwindows.com/gfw/images/plugins/lastfm.png", types);
         }
         function LastFMGrowlinterval(originalTitle,appname){
-            var newTitle=document.title;
-            console.log("current Title:"+newTitle);
+            //var newTitle=document.title;
+            //console.log("current Title:"+newTitle);
             console.log("original title: "+originalTitle);
-            if(document.getElementById("radioTrackMeta")){
-                var creator=document.getElementById("radioTrackMeta").getElementsByTagName('p')[0].getElementsByClassName("artist")[0].getElementsByTagName('a')[0].innerHTML;
-                var name=document.getElementById("radioTrackMeta").getElementsByTagName('p')[0].getElementsByClassName("track")[0].getElementsByTagName('a')[0].innerHTML;
+            //document.getElementsByClassName("top-bar")[0].getElementsByTagName("div")[0].getElementsByTagName("section")[0].getElementsByClassName("player-bar-now-playing")[0].getElementsByTagName("p")[0].getElementsByClassName("player-bar-artist-name")[0]
+            //document.getElementsByClassName("top-bar")[0].getElementsByTagName("div")[0].getElementsByTagName("section")[0].getElementsByClassName("player-bar-now-playing")[0].getElementsByTagName("p")[0].getElementsByClassName("player-bar-track-name")[0]
+            if(document.getElementsByClassName("top-bar")[0].getElementsByTagName("div")[0].getElementsByTagName("section")[0].getElementsByClassName("player-bar-now-playing")[0].getElementsByTagName("p")[0].getElementsByClassName("player-bar-artist-name")[0]){
+                var creator=document.getElementsByClassName("top-bar")[0].getElementsByTagName("div")[0].getElementsByTagName("section")[0].getElementsByClassName("player-bar-now-playing")[0].getElementsByTagName("p")[0].getElementsByClassName("player-bar-artist-name")[0].innerHTML;
+                var name=document.getElementsByClassName("top-bar")[0].getElementsByTagName("div")[0].getElementsByTagName("section")[0].getElementsByClassName("player-bar-now-playing")[0].getElementsByTagName("p")[0].getElementsByClassName("player-bar-track-name")[0].innerHTML;
             }
             else{
                 var creator="Unknown";
@@ -74,13 +76,13 @@ GrowlMonkey = function(){
             //var  albumImage=null;
             //console.log("ARTIST "+creator);
             //console.log("TRACK "+name);
-            if (newTitle !== originalTitle) {
-                originalTitle=newTitle;
+            if (creator !== originalTitle) {
+                originalTitle=creator;
                 console.log('Sent Last.fm Growl notification');
                 //GrowlMonkey.notify("APPLICATION NAME", "NOTIFICATION TYPE", "TITLE", "TEXT", "ICON URL");
                 GrowlMonkey.notify(appname, 'songplayed',creator, name);
                 scrobble="UNKNOWN";
-                scrobble=LastFMScrobble(appname,creator,name,scrobble);
+                //scrobble=LastFMScrobble(appname,creator,name,scrobble);
             }
             else{
                 console.log('same song');
@@ -243,13 +245,13 @@ GrowlMonkey = function(){
         }
 //Main Script starts here
 //Display fix when zooming in and out
-//leftcolumn
-document.getElementById("leftColumn").style.width="560px";
-//rightcolumn
-document.getElementById("rightColumn").style.width="350px";
+//left column
+//document.getElementById("leftColumn").style.width="560px";
+//right column
+//document.getElementById("rightColumn").style.width="350px";
         var appname= 'Last FM Growl JPC';
         LastFMGrowlinit(appname);
-        var originalTitle = document.title;
+        var originalTitle = "not playing yet";
         console.log("Original Title:"+originalTitle);
         scrobble="UNKNOWN";
         //var count=0;
@@ -258,7 +260,7 @@ document.getElementById("rightColumn").style.width="350px";
             originalTitle=returnVar[0];
             creator=returnVar[1];
             name=returnVar[2];
-            scrobble=LastFMScrobble(appname,creator,name,scrobble);
+            //scrobble=LastFMScrobble(appname,creator,name,scrobble);
             //destroy growl html elements
             destroyGrowl();
             //count++;

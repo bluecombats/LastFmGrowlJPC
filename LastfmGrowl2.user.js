@@ -2,12 +2,13 @@
 // @name          Last FM Growl JPC
 // @namespace     http://www.bluecombats.blogspot.com
 // @description	  Sends Growl notifications from the Last.fm website when the currently playing track changes. Changes to when track is changed, also scrobble notification should work better.
-// @icon             http://www.growlforwindows.com/gfw/images/plugins/lastfm.png
+// @icon      		http://www.growlforwindows.com/gfw/images/plugins/lastfm.png
+// @grant			none
 // @include       http://last.fm/listen*
 // @include       http://www.last.fm/listen*
 // @include       http*last.fm/listen*
 // @include       http*www.last.fm/listen*
-// @version        1.31
+// @version        1.41
 // ==/UserScript==
 
 GrowlMonkey = function(){
@@ -51,23 +52,16 @@ GrowlMonkey = function(){
             ntNewSong.displayName = 'Song Played';
             ntNewSong.enabled = true;
 
-            var ntUserStats = {};
-            ntUserStats.name = 'scrobbleStats';
-            ntUserStats.displayName =  'Scrobble Stats';
-            ntUserStats.enabled = true;
-
-            var types = [ntNewSong, ntUserStats];
+            var types = [ntNewSong];
             GrowlMonkey.register(appname, "http://www.growlforwindows.com/gfw/images/plugins/lastfm.png", types);
         }
         function LastFMGrowlinterval(originalTitle,appname){
-            //var newTitle=document.title;
             //console.log("current Title:"+newTitle);
             console.log("original title: "+originalTitle);
-            //document.getElementsByClassName("top-bar")[0].getElementsByTagName("div")[0].getElementsByTagName("section")[0].getElementsByClassName("player-bar-now-playing")[0].getElementsByTagName("p")[0].getElementsByClassName("player-bar-artist-name")[0]
-            //document.getElementsByClassName("top-bar")[0].getElementsByTagName("div")[0].getElementsByTagName("section")[0].getElementsByClassName("player-bar-now-playing")[0].getElementsByTagName("p")[0].getElementsByClassName("player-bar-track-name")[0]
-            if(document.getElementsByClassName("top-bar")[0].getElementsByTagName("div")[0].getElementsByTagName("section")[0].getElementsByClassName("player-bar-now-playing")[0].getElementsByTagName("p")[0].getElementsByClassName("player-bar-artist-name")[0]){
-                var creator=document.getElementsByClassName("top-bar")[0].getElementsByTagName("div")[0].getElementsByTagName("section")[0].getElementsByClassName("player-bar-now-playing")[0].getElementsByTagName("p")[0].getElementsByClassName("player-bar-artist-name")[0].innerHTML;
-                var name=document.getElementsByClassName("top-bar")[0].getElementsByTagName("div")[0].getElementsByTagName("section")[0].getElementsByClassName("player-bar-now-playing")[0].getElementsByTagName("p")[0].getElementsByClassName("player-bar-track-name")[0].innerHTML;
+            
+            if(document.getElementsByClassName("player-bar-artist-name")[0]){
+                var creator=document.getElementsByClassName("player-bar-artist-name")[0].innerHTML;
+                var name=document.getElementsByClassName("player-bar-track-name")[0].innerHTML;
             }
             else{
                 var creator="Unknown";
@@ -89,127 +83,7 @@ GrowlMonkey = function(){
             }
             return [originalTitle,creator,name];
         }
-        function LastFMScrobble(appname,creator,name,scrobble){
-            oldScrobble=scrobble;
-            console.log('Getting User statistics');
-            //get total artist plays
-            if(document.getElementById("userStats")){
-                if(document.getElementById("userStats").getElementsByTagName('p')[0]){
-                    if(document.getElementById("userStats").getElementsByTagName('p')[0].getElementsByTagName('a')[1]){
-                            console.log("getting total plays");
-                            var TotalPlays=document.getElementById("userStats").getElementsByTagName('p')[0].getElementsByTagName('a')[1].innerHTML;
-                            TotalPlays=removeHtml(TotalPlays);
-                        
-                    }
-                    else{
-                        console.log("TotalPlays1 FAIL");
-                        var TotalPlays=null;
-                    }
-                }
-                else{
-                    console.log("TotalPlays2 FAIL");
-                    var TotalPlays=null;
-                }
-            }
-            else{
-                console.log("TotalPlays3 FAIL");
-                var TotalPlays=null;
-            }
-            //Indivplays
-            if(document.getElementById("userStats")){
-                if(document.getElementById("userStats").getElementsByTagName('p')[0]){
-                    if(document.getElementById("userStats").getElementsByTagName('p')[0].getElementsByTagName('a')[3]){
-                        console.log("getting indiv plays");
-                        var IndivPlays=document.getElementById("userStats").getElementsByTagName('p')[0].getElementsByTagName('a')[3].innerHTML;
-                        IndivPlays=removeHtml(IndivPlays);
-                        //console.log("INDIV PLAYS"+IndivPlays);
-                    }
-                    else{
-                        console.log("IndivPlays1 FAIL");
-                        var IndivPlays=null;
-                    }
-                }
-                else{
-                    console.log("IndivPlays2 FAIL");
-                    var IndivPlays=null;
-                }
-            }
-            else{
-                console.log("IndivPlays3 FAIL");
-                var IndivPlays=null;
-            }
-            //scrobble
-            //userstats/3rd papragraph 1st link
-            //radioControlScrobbleToggle/div[0]
-            //class=lfmradio:scrobbleToggle enabled
-            //id radioControlScrobbleToggle
-            if(document.getElementsByClassName("lfmradio:scrobbleToggle enabled")[0]){
-                    scrobble="Turn scrobbling off";
-            }
-            else if(document.getElementsByClassName("lfmradio:scrobbleToggle")[0]){
-                    scrobble="Turn scrobbling on";
-            }
-            else{
-                console.log("Scrobble FAIL 1");
-            }
-            //default settings
-            if(TotalPlays){
-                if(TotalPlays=="Your Library"){
-                    var TotalPlays="0 times";
-                    var IndivPlays="0 times";
-                }
-            }else{
-                console.log("default total plays 0 times");
-                //var TotalPlays="0 times";
-            }
-            if(IndivPlays){
-                if(IndivPlays=="Your Library"){
-                    var IndivPlays="0 times";
-                }
-            }else{
-                console.log("default individual plays 0 times");
-                //var IndivPlays="0 times";
-            }
-            if(scrobble=="Turn scrobbling on"||scrobble=="Turn scrobbling off"){
-            }
-            else{
-                console.log("default scrobble status unknown");
-                var scrobble="UNKNOWN";
-            }
-            scrobble=scrobble.trim();
-            
-            //console check
-            console.log("TOTAL PLAYS:"+TotalPlays);
-            console.log("INDIVI PLAYS:"+IndivPlays);
-            console.log("OLDSCROBBLE:"+oldScrobble);
-            console.log("NEWSCROBBLE:"+scrobble);
-            //plays stats is it not null
-            if(TotalPlays){
-                //has scrobble changed
-                if(oldScrobble!==scrobble){
-                    //if off text should read
-                    if(scrobble=="Turn scrobbling on"){
-                        console.log('scrobble OFF "'+creator+'\" '+TotalPlays + "\n" + ' and "'+name+'\" '+IndivPlays);
-                        //GrowlMonkey.notify("APPLICATION NAME", "NOTIFICATION TYPE", "TITLE", "TEXT", "ICON URL");
-                        GrowlMonkey.notify(appname, 'scrobbleStats', 'Scrobble is OFF', 'You have played "'+creator+'\" '+TotalPlays + "\n" + ' and "'+name+'\" '+IndivPlays);
-                    }
-                    //if on text should read
-                    else if(scrobble=="Turn scrobbling off"){
-                        console.log('scrobble ON "'+creator+'\" '+TotalPlays + "\n" + ' and "'+name+'\" '+IndivPlays);
-                        //GrowlMonkey.notify("APPLICATION NAME", "NOTIFICATION TYPE", "TITLE", "TEXT", "ICON URL");
-                        GrowlMonkey.notify(appname, 'scrobbleStats', 'Scrobble is ON', 'You have played "'+creator+'\" '+TotalPlays + "\n" + ' and "'+name+'\" '+IndivPlays);
-                    }
-                    else{
-                        console.log("NO DATA");
-                    }
-                }
-            }
-            else{
-                //no change in scrobble
-            }
-            return scrobble;
-        }
-        function removeHtml(tweet){
+		function removeHtml(tweet){
             //find 1st occurence of <
             var lessthan=tweet.indexOf("<");
             while(lessthan!=-1){
@@ -244,11 +118,6 @@ GrowlMonkey = function(){
             }
         }
 //Main Script starts here
-//Display fix when zooming in and out
-//left column
-//document.getElementById("leftColumn").style.width="560px";
-//right column
-//document.getElementById("rightColumn").style.width="350px";
         var appname= 'Last FM Growl JPC';
         LastFMGrowlinit(appname);
         var originalTitle = "not playing yet";
@@ -260,7 +129,6 @@ GrowlMonkey = function(){
             originalTitle=returnVar[0];
             creator=returnVar[1];
             name=returnVar[2];
-            //scrobble=LastFMScrobble(appname,creator,name,scrobble);
             //destroy growl html elements
             destroyGrowl();
             //count++;
